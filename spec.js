@@ -1,19 +1,6 @@
-const express = require('express');
-const app = express();
-const Sequelize = require('sequelize');
-const conn = new Sequelize(process.env.DATABASE_URL || 'postgres://localhost/acme_db_test');
-
-const User = conn.define('user', {
-    name: Sequelize.STRING
-});
-
+const app = require('supertest')(require('./app'));
+const { conn, User } = require('./db');
 const { expect } = require('chai');
-
-const _app = require('supertest')(app);
-
-app.get('/api/users', async(req, res, next) => {
-    res.send(await User.findAll());
-});
 
 describe('the truth', () => {
     it('true to equal true', () => {
@@ -30,7 +17,7 @@ describe('GET /api/users', () => {
         ]);     
     });
     it('returns the users', async () => {
-        const response = await _app.get('/api/users');
+        const response = await app.get('/api/users');
         expect(response.status).to.equal(200);
         expect(response.body.length).to.equal(2);
     }); 
